@@ -19,7 +19,25 @@ class ComplaintController extends Controller {
   findById(req, res, next) {
     return this.model.Schema
       .findById(req.params.id)
-      .populate('snapshots')
+      .populate(
+        'snapshots', null, null,
+        { sort: { createTime: -1 } }
+      )
+      .exec()
+      .then(doc => {
+        if (!doc) { return res.status(404).end(); }
+        return res.status(200).json(doc);
+      })
+      .catch(err => next(err));
+  }
+
+  findByPlate(req, res, next) {
+    return this.model.Schema
+      .findOne({ plate: req.params.plate })
+      .populate(
+        'snapshots', null, null,
+        { sort: { createTime: -1 } }
+      )
       .exec()
       .then(doc => {
         if (!doc) { return res.status(404).end(); }
