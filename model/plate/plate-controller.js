@@ -39,7 +39,7 @@ class PlateController extends Controller {
 
         res.status(201).json(plate);
       })
-      .catch(err => next(err));
+      .catch(err => res.status(400).json(err.errors));
   }
 }
 

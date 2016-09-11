@@ -52,7 +52,7 @@ class ComplaintController extends Controller {
         // create complaint
         this.model.create(body)
           .then(complaint => res.status(201).json(complaint))
-          .catch(err => next(err));
+          .catch(err => res.status(400).json(err.errors));
       })
       .catch(err => next(err));
   }
