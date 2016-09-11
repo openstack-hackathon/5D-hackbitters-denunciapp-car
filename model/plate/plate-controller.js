@@ -1,5 +1,6 @@
 const Controller = require('../../lib/controller');
 const userModel  = require('./plate-facade');
+const complaintModel = require('../complaint/complaint-facade');
 
 
 class PlateController extends Controller {
@@ -13,14 +14,31 @@ class PlateController extends Controller {
   }
 
   create(req, res, next) {
-    let body = req.body;
+    const body = req.body;
 
     // Parse unix date to timestamp date
     body.capturedTime = new Date(body.capturedTime);
 
     // Insert register
     this.model.create(body)
-      .then(doc => res.status(201).json(doc))
+      .then(plate => {
+        // find complaint
+        complaintModel.findOne({
+          plate: plate.plate
+        }, '-createTime')
+          .then(complaint => {
+            if (complaint !== null) {
+              complaintModel.update({ _id: complaint._id }, {
+                status: true,
+                $pushAll: { snapshots: [plate._id] }
+              })
+              .then(doc => console.log(doc));
+            }
+          })
+          .catch(err => next(err));
+
+        res.status(201).json(plate);
+      })
       .catch(err => next(err));
   }
 }

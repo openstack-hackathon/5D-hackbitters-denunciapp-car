@@ -7,7 +7,10 @@ class ComplaintController extends Controller {
     return this.model.Schema
       .find(req.query)
       .sort('-createTime')
-      .populate('snapshots')
+      .populate(
+        'snapshots', null, null,
+        { sort: { createTime: -1 } }
+      )
       .exec()
       .then(collection => res.status(200).json(collection))
       .catch(err => next(err));
@@ -35,15 +38,15 @@ class ComplaintController extends Controller {
     dateRange.setMinutes(dateRange.getMinutes() - 30);
 
     // search de las caputured
-    plateModel.findOne({
+    plateModel.find({
       plate: plateReg,
       createTime: { $gte: dateRange }
     }, '-createTime')
-      .then(plate => {
+      .then(plates => {
         // if find the last captured set status to true
-        if (plate !== null) {
+        if (plates !== null) {
           body.status = true;
-          body.snapshots = [plate._id];
+          body.snapshots = plates.map((plate) => plate._id);
         }
 
         // create complaint
