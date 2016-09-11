@@ -3,8 +3,11 @@ const Schema   = mongoose.Schema;
 
 
 const userSchema = new Schema({
-  title: { type: String, required: true },
-  body:  { type: String }
+  firstName: { type: String, required: true },
+  lastName:  { type: String, required: true },
+  plate: { type: String, required: true },
+  modelCar: { type: Number, required: true },
+  brandCar: { type: String, required: true }
 });
 
 
